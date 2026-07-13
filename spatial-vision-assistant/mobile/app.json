@@ -1,0 +1,40 @@
+{
+  "expo": {
+    "name": "Spatial Vision Assistant",
+    "slug": "spatial-vision-assistant",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "backgroundColor": "#0a0a0f",
+    "splash": {
+      "backgroundColor": "#0a0a0f"
+    },
+    "ios": {
+      "supportsTablet": false,
+      "infoPlist": {
+        "NSCameraUsageDescription": "Camera is required to capture your surroundings for spatial analysis.",
+        "NSMicrophoneUsageDescription": "Microphone is required to capture your voice question.",
+        "UIAccessibilityElement": true
+      }
+    },
+    "android": {
+      "permissions": [
+        "CAMERA",
+        "RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow Spatial Vision Assistant to access your camera."
+        }
+      ],
+      [
+        "expo-av",
+        {
+          "microphonePermission": "Allow Spatial Vision Assistant to access your microphone."
+        }
+      ]
+    ]
+  }
+}

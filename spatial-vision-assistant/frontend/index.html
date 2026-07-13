@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spatial Vision Assistant</title>
+  <meta name="description" content="AI-powered spatial scene description for visually impaired users. Upload a photo and ask a question — get an accurate spoken description of your surroundings." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <header>
+    <div class="logo">
+      <span class="logo-icon">👁</span>
+      <span class="logo-text">Spatial Vision</span>
+    </div>
+    <span class="badge">AI Powered</span>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>See the World<br /><span class="gradient-text">Through Sound</span></h1>
+      <p class="subtitle">Upload a photo, ask a question, and receive a precise spatial audio description of your surroundings.</p>
+    </section>
+
+    <!-- ── Step 1: Upload ── -->
+    <div class="card" id="upload-card">
+      <div class="step-label">Step 1</div>
+      <h2>Upload Photo</h2>
+
+      <div
+        class="drop-zone"
+        id="drop-zone"
+        role="button"
+        tabindex="0"
+        aria-label="Upload photo. Click or drag and drop an image file here."
+      >
+        <div class="drop-zone-inner" id="drop-zone-inner">
+          <div class="upload-icon">📷</div>
+          <p class="drop-title">Drag & drop or click to upload</p>
+          <p class="drop-sub">JPEG · PNG · WEBP — max 10 MB</p>
+        </div>
+        <img id="preview-img" class="preview-img hidden" alt="Uploaded photo preview" />
+        <input type="file" id="file-input" accept="image/*" aria-hidden="true" />
+      </div>
+
+      <button class="btn-secondary" id="clear-btn" style="display:none;" aria-label="Remove uploaded photo">
+        ✕ Remove photo
+      </button>
+    </div>
+
+    <!-- ── Step 2: Question ── -->
+    <div class="card" id="question-card">
+      <div class="step-label">Step 2</div>
+      <h2>Ask Your Question</h2>
+
+      <div class="input-row">
+        <textarea
+          id="question-input"
+          rows="3"
+          placeholder="e.g. What objects are on the table in front of me?"
+          aria-label="Type your question about the image"
+        ></textarea>
+      </div>
+
+      <div class="divider"><span>or</span></div>
+
+      <!-- Voice recording -->
+      <div class="voice-section">
+        <button
+          class="btn-voice"
+          id="voice-btn"
+          aria-label="Hold to record your question"
+          aria-pressed="false"
+        >
+          <span class="mic-icon">🎤</span>
+          <span id="voice-btn-label">Hold to Record</span>
+        </button>
+        <div class="waveform" id="waveform" aria-hidden="true">
+          <span></span><span></span><span></span><span></span><span></span>
+          <span></span><span></span><span></span><span></span><span></span>
+        </div>
+        <p class="voice-hint" id="voice-hint"></p>
+      </div>
+    </div>
+
+    <!-- ── Step 3: Analyze ── -->
+    <div class="card" id="action-card">
+      <div class="step-label">Step 3</div>
+      <h2>Analyze Scene</h2>
+      <p class="card-desc">AI will describe the spatial layout of everything in the image.</p>
+
+      <button
+        class="btn-primary"
+        id="analyze-btn"
+        aria-label="Analyze scene and get spatial description"
+      >
+        <span id="analyze-icon">✨</span>
+        <span id="analyze-label">Analyze Scene</span>
+      </button>
+
+      <!-- Loading state -->
+      <div class="loader-row hidden" id="loader-row" aria-live="polite" aria-label="Processing...">
+        <div class="spinner"></div>
+        <span id="loader-text">Sending to AI…</span>
+      </div>
+    </div>
+
+    <!-- ── Result ── -->
+    <div class="card result-card hidden" id="result-card" aria-live="polite">
+      <div class="result-header">
+        <span class="result-icon">🔊</span>
+        <h2>Spatial Description</h2>
+      </div>
+      <p id="result-text" class="result-text"></p>
+      <div class="result-actions">
+        <button class="btn-tts" id="tts-btn" aria-label="Read description aloud">
+          ▶ Read Aloud
+        </button>
+        <button class="btn-stop hidden" id="tts-stop-btn" aria-label="Stop reading">
+          ⏹ Stop
+        </button>
+        <button class="btn-copy" id="copy-btn" aria-label="Copy description to clipboard">
+          📋 Copy
+        </button>
+      </div>
+    </div>
+
+    <!-- ── Error ── -->
+    <div class="error-box hidden" id="error-box" role="alert">
+      <span>⚠</span>
+      <p id="error-text"></p>
+    </div>
+  </main>
+
+  <footer>
+    <p>Spatial Vision Assistant · Backend powered by <strong>FastAPI + vLLM (Qwen2-VL)</strong></p>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
