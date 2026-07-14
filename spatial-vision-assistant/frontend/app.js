@@ -190,7 +190,7 @@ if (!SpeechRecognition) {
   recognition = new SpeechRecognition();
   recognition.continuous = false;
   recognition.interimResults = true;
-  recognition.lang = "en-US";
+  recognition.lang = "tr-TR";
 
   recognition.onstart = () => {
     isRecording = true;
@@ -291,9 +291,14 @@ analyzeBtn.addEventListener("click", async () => {
 function speakText(text) {
   window.speechSynthesis.cancel(); // stop any previous
   const utter = new SpeechSynthesisUtterance(text);
-  utter.rate  = 0.92;
+  utter.rate  = 0.88;
   utter.pitch = 1.0;
-  utter.lang  = "en-US";
+  utter.lang  = "tr-TR";
+
+  // Try to find a Turkish voice
+  const voices = window.speechSynthesis.getVoices();
+  const trVoice = voices.find(v => v.lang.startsWith("tr"));
+  if (trVoice) utter.voice = trVoice;
 
   utter.onstart = () => {
     ttsBtn.classList.add("hidden");
