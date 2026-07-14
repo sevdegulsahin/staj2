@@ -49,6 +49,7 @@ let imageBase64 = null;      // raw base64 (no data URI prefix)
 let isAnalyzing = false;
 let recognition = null;      // SpeechRecognition instance
 let isRecording = false;
+let chatHistory = [];        // Store conversation history
 
 // ─── Utilities ────────────────────────────────────────────────────────────────
 function showError(msg) {
@@ -137,6 +138,7 @@ function loadFile(file) {
   // Compress and store
   compressImage(file).then((b64) => {
     imageBase64 = b64;
+    chatHistory = []; // clear history for new photo
   });
 }
 
@@ -173,6 +175,7 @@ dropZone.addEventListener("drop", (e) => {
 // Clear photo
 clearBtn.addEventListener("click", () => {
   imageBase64 = null;
+  chatHistory = [];
   previewImg.src = "";
   previewImg.classList.add("hidden");
   dropZoneInner.classList.remove("hidden");
@@ -382,6 +385,7 @@ async function takePhotoFromCamera() {
         
         const dataUrl = finalCanvas.toDataURL("image/jpeg", 0.82);
         imageBase64 = dataUrl.split(",")[1];
+        chatHistory = []; // clear history for new photo
         
         // Show in UI
         previewImg.src = dataUrl;
@@ -481,6 +485,7 @@ analyzeBtn.addEventListener("click", async () => {
       body: JSON.stringify({
         image_base64: imageBase64,
         user_prompt: prompt,
+        history: chatHistory,
       }),
     });
 
@@ -491,6 +496,13 @@ analyzeBtn.addEventListener("click", async () => {
 
     const data = await response.json();
     const description = data.description;
+    
+    // Update history
+    chatHistory.push({ role: "user", content: prompt });
+    chatHistory.push({ role: "assistant", content: description });
+    
+    // Clear the input so they can ask a follow up question easily
+    questionInput.value = "";
 
     // Show result
     resultText.textContent = description;

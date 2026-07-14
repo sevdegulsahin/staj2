@@ -15,38 +15,53 @@ logger = logging.getLogger(__name__)
 _HEADERS = {"Content-Type": "application/json"}
 
 
-async def query_vlm(image_base64: str, user_prompt: str) -> str:
+async def query_vlm(image_base64: str, user_prompt: str, history: list = None) -> str:
     """
-    Send base64-encoded image + text prompt to the vLLM endpoint.
+    Send base64-encoded image + text prompt + optional history to the vLLM endpoint.
 
     Returns the model's response text (spatial description).
     """
 
+    # Start with the system prompt
+    messages = [
+        {"role": "system", "content": settings.SYSTEM_PROMPT}
+    ]
+
+    # Reconstruct history for multi-turn conversation
+    if not history:
+        # First turn: attach the image to the user's prompt
+        messages.append({
+            "role": "user",
+            "content": [
+                {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}},
+                {"type": "text", "text": user_prompt},
+            ],
+        })
+    else:
+        # We have history. The VERY FIRST user message must contain the image.
+        for idx, msg in enumerate(history):
+            msg_dict = msg.model_dump() if hasattr(msg, "model_dump") else msg
+            role = msg_dict["role"]
+            text_content = msg_dict["content"]
+            
+            if idx == 0 and role == "user":
+                messages.append({
+                    "role": "user",
+                    "content": [
+                        {"type": "image_url", "image_url": {"url": f"data:image/jpeg;base64,{image_base64}"}},
+                        {"type": "text", "text": text_content},
+                    ]
+                })
+            else:
+                messages.append({"role": role, "content": text_content})
+                
+        # Append the new current prompt as text-only (since Qwen2-VL already saw the image)
+        messages.append({"role": "user", "content": user_prompt})
+
     # Build the multimodal message payload (OpenAI vision format)
     payload = {
         "model": settings.VLLM_MODEL,
-        "messages": [
-            {
-                "role": "system",
-                "content": settings.SYSTEM_PROMPT,
-            },
-            {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {
-                            # vLLM / Qwen2-VL accepts data URIs
-                            "url": f"data:image/jpeg;base64,{image_base64}",
-                        },
-                    },
-                    {
-                        "type": "text",
-                        "text": user_prompt,
-                    },
-                ],
-            },
-        ],
+        "messages": messages,
         "max_tokens": 512,
         "temperature": 0.3,
     }

@@ -12,6 +12,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
+from typing import List, Optional
 
 from app.config import settings
 from app.services.whisper_service import transcribe_audio
@@ -48,9 +49,14 @@ app.add_middleware(
 # ---------------------------------------------------------------------------
 # Schemas
 # ---------------------------------------------------------------------------
+class Message(BaseModel):
+    role: str
+    content: str
+
 class VisionRequest(BaseModel):
     image_base64: str       # JPEG/PNG encoded as base64 string
     user_prompt: str        # already-transcribed text question (optional path)
+    history: Optional[List[Message]] = []
 
 class VisionResponse(BaseModel):
     description: str        # spatial description to read aloud
@@ -60,6 +66,7 @@ class VisionResponse(BaseModel):
 class AudioVisionRequest(BaseModel):
     image_base64: str       # JPEG/PNG as base64
     audio_base64: str       # WAV/MP3 as base64 (raw voice recording)
+    history: Optional[List[Message]] = []
 
 
 # ---------------------------------------------------------------------------
@@ -86,7 +93,7 @@ async def analyze(req: VisionRequest):
     if not req.user_prompt.strip():
         raise HTTPException(status_code=400, detail="user_prompt is required")
 
-    description = await query_vlm(req.image_base64, req.user_prompt)
+    description = await query_vlm(req.image_base64, req.user_prompt, req.history)
 
     audio_b64 = None
     if settings.TTS_ENABLED:
@@ -111,7 +118,7 @@ async def analyze_voice(req: AudioVisionRequest):
     user_prompt = await transcribe_audio(audio_bytes)
     logger.info("Whisper transcript: %s", user_prompt)
 
-    description = await query_vlm(req.image_base64, user_prompt)
+    description = await query_vlm(req.image_base64, user_prompt, req.history)
 
     audio_b64 = None
     if settings.TTS_ENABLED:
