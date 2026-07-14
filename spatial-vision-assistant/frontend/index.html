@@ -10,6 +10,11 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <!-- Intro Overlay for audio permission -->
+  <div id="intro-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.95); z-index:9999; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; text-align:center; cursor:pointer; padding:2rem;">
+    Başlamak için ekrana dokunun veya herhangi bir tuşa basın.
+  </div>
+
   <div class="bg-orbs">
     <div class="orb orb-1"></div>
     <div class="orb orb-2"></div>
@@ -50,6 +55,10 @@
         <img id="preview-img" class="preview-img hidden" alt="Uploaded photo preview" />
         <input type="file" id="file-input" accept="image/*" aria-hidden="true" />
       </div>
+
+      <button class="btn-primary" id="camera-btn" aria-label="Kameradan fotoğraf çek" style="margin-top: 1rem; width: 100%;">
+        📷 Kameradan Çek (İki kere Boşluk)
+      </button>
 
       <button class="btn-secondary" id="clear-btn" style="display:none;" aria-label="Yüklenen fotoğrafı kaldır">
         ✕ Fotoğrafı kaldır

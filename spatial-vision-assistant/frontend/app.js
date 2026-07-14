@@ -20,6 +20,8 @@ const dropZoneInner  = document.getElementById("drop-zone-inner");
 const fileInput      = document.getElementById("file-input");
 const previewImg     = document.getElementById("preview-img");
 const clearBtn       = document.getElementById("clear-btn");
+const cameraBtn      = document.getElementById("camera-btn");
+const introOverlay   = document.getElementById("intro-overlay");
 
 const questionInput  = document.getElementById("question-input");
 const voiceBtn       = document.getElementById("voice-btn");
@@ -178,6 +180,90 @@ clearBtn.addEventListener("click", () => {
   fileInput.value = "";
   resultCard.classList.add("hidden");
 });
+
+// ─── Intro & Audio Permission ─────────────────────────────────────────────────
+let isIntroPlayed = false;
+
+function playIntro() {
+  if (isIntroPlayed) return;
+  isIntroPlayed = true;
+  introOverlay.style.display = "none";
+  speakText("Mekansal Görme Asistanına hoş geldiniz. Fotoğraf çekmek için iki kere boşluk tuşuna basın.");
+}
+
+// Any interaction removes the overlay and plays the intro
+document.addEventListener("click", playIntro, { once: true });
+document.addEventListener("keydown", playIntro, { once: true });
+
+// ─── Camera Access (Double Space) ─────────────────────────────────────────────
+let lastSpacePress = 0;
+
+document.addEventListener("keydown", (e) => {
+  if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return;
+
+  if (e.key === " ") {
+    e.preventDefault(); // prevent page scroll
+    const now = Date.now();
+    if (now - lastSpacePress < 500) { // 500ms for double tap
+      lastSpacePress = 0;
+      takePhotoFromCamera();
+    } else {
+      lastSpacePress = now;
+    }
+  }
+});
+
+cameraBtn.addEventListener("click", takePhotoFromCamera);
+
+async function takePhotoFromCamera() {
+  try {
+    speakText("Kamera açılıyor, lütfen bekleyin...");
+    // Request back camera if on mobile, default on desktop
+    const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
+    
+    const video = document.createElement("video");
+    video.srcObject = stream;
+    video.setAttribute("playsinline", "");
+    video.play();
+    
+    video.onplaying = () => {
+      // 1.5 seconds delay for the camera to adjust exposure/focus
+      setTimeout(() => {
+        const canvas = document.createElement("canvas");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Stop all video tracks
+        stream.getTracks().forEach(track => track.stop());
+        
+        // Compress and extract base64
+        const MAX_W = 768;
+        const scale = canvas.width > MAX_W ? MAX_W / canvas.width : 1;
+        const finalCanvas = document.createElement("canvas");
+        finalCanvas.width = canvas.width * scale;
+        finalCanvas.height = canvas.height * scale;
+        const finalCtx = finalCanvas.getContext("2d");
+        finalCtx.drawImage(canvas, 0, 0, finalCanvas.width, finalCanvas.height);
+        
+        const dataUrl = finalCanvas.toDataURL("image/jpeg", 0.82);
+        imageBase64 = dataUrl.split(",")[1];
+        
+        // Show in UI
+        previewImg.src = dataUrl;
+        previewImg.classList.remove("hidden");
+        dropZoneInner.classList.add("hidden");
+        clearBtn.style.display = "block";
+        
+        speakText("Fotoğraf çekildi. Lütfen sorunuzu sorun.");
+      }, 1500);
+    };
+  } catch (err) {
+    speakText("Kameraya erişilemedi. Lütfen izinleri kontrol edin.");
+    showError("Camera error: " + err.message);
+  }
+}
 
 // ─── Voice Input (Web Speech API) ────────────────────────────────────────────
 const SpeechRecognition =
