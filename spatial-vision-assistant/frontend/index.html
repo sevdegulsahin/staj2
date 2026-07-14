@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Spatial Vision Assistant</title>
-  <meta name="description" content="AI-powered spatial scene description for visually impaired users. Upload a photo and ask a question — get an accurate spoken description of your surroundings." />
+  <title>Mekansal Görme Asistanı</title>
+  <meta name="description" content="Görme engelli kullanıcılar için AI destekli mekansal sahne açıklaması. Fotoğraf yükle, soru sor, çevreni sesli olarak öğren." />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
@@ -19,54 +19,54 @@
   <header>
     <div class="logo">
       <span class="logo-icon">👁</span>
-      <span class="logo-text">Spatial Vision</span>
+      <span class="logo-text">Mekansal Görme</span>
     </div>
     <span class="badge">AI Powered</span>
   </header>
 
   <main>
     <section class="hero">
-      <h1>See the World<br /><span class="gradient-text">Through Sound</span></h1>
-      <p class="subtitle">Upload a photo, ask a question, and receive a precise spatial audio description of your surroundings.</p>
+      <h1>Dünyayı<br /><span class="gradient-text">Sesle Gör</span></h1>
+      <p class="subtitle">Fotoğraf yükle, soru sor ve çevrenizdeki nesnelerin mekansal konumlarını sesli olarak öğren.</p>
     </section>
 
     <!-- ── Step 1: Upload ── -->
     <div class="card" id="upload-card">
-      <div class="step-label">Step 1</div>
-      <h2>Upload Photo</h2>
+      <div class="step-label">Adım 1</div>
+      <h2>Fotoğraf Yükle</h2>
 
       <div
         class="drop-zone"
         id="drop-zone"
         role="button"
         tabindex="0"
-        aria-label="Upload photo. Click or drag and drop an image file here."
+        aria-label="Fotoğraf yükle. Bir resim dosyasını buraya sürükleyin veya tıklayın."
       >
         <div class="drop-zone-inner" id="drop-zone-inner">
           <div class="upload-icon">📷</div>
-          <p class="drop-title">Drag & drop or click to upload</p>
-          <p class="drop-sub">JPEG · PNG · WEBP — max 10 MB</p>
+          <p class="drop-title">Sürükle & bırak veya tıkla</p>
+          <p class="drop-sub">JPEG · PNG · WEBP — maks 10 MB</p>
         </div>
         <img id="preview-img" class="preview-img hidden" alt="Uploaded photo preview" />
         <input type="file" id="file-input" accept="image/*" aria-hidden="true" />
       </div>
 
-      <button class="btn-secondary" id="clear-btn" style="display:none;" aria-label="Remove uploaded photo">
-        ✕ Remove photo
+      <button class="btn-secondary" id="clear-btn" style="display:none;" aria-label="Yüklenen fotoğrafı kaldır">
+        ✕ Fotoğrafı kaldır
       </button>
     </div>
 
     <!-- ── Step 2: Question ── -->
     <div class="card" id="question-card">
-      <div class="step-label">Step 2</div>
-      <h2>Ask Your Question</h2>
+      <div class="step-label">Adım 2</div>
+      <h2>Sorunuzu Sorun</h2>
 
       <div class="input-row">
         <textarea
           id="question-input"
           rows="3"
-          placeholder="e.g. What objects are on the table in front of me?"
-          aria-label="Type your question about the image"
+          placeholder="Örnek: Önümdeki masanın üzerinde ne var?"
+          aria-label="Görüntü hakkındaki sorunuzu yazın"
         ></textarea>
       </div>
 
@@ -77,11 +77,11 @@
         <button
           class="btn-voice"
           id="voice-btn"
-          aria-label="Hold to record your question"
+          aria-label="Sorunuzu kaydetmek için basılı tutun"
           aria-pressed="false"
         >
           <span class="mic-icon">🎤</span>
-          <span id="voice-btn-label">Hold to Record</span>
+          <span id="voice-btn-label">Kayıt için Tıkla</span>
         </button>
         <div class="waveform" id="waveform" aria-hidden="true">
           <span></span><span></span><span></span><span></span><span></span>
@@ -93,17 +93,17 @@
 
     <!-- ── Step 3: Analyze ── -->
     <div class="card" id="action-card">
-      <div class="step-label">Step 3</div>
-      <h2>Analyze Scene</h2>
-      <p class="card-desc">AI will describe the spatial layout of everything in the image.</p>
+      <div class="step-label">Adım 3</div>
+      <h2>Sahneyi Analiz Et</h2>
+      <p class="card-desc">Yapay zeka, görüntüdeki her şeyin mekansal düzenini Türkçe olarak açıklayacak.</p>
 
       <button
         class="btn-primary"
         id="analyze-btn"
-        aria-label="Analyze scene and get spatial description"
+        aria-label="Sahneyi analiz et ve mekansal açıklama al"
       >
         <span id="analyze-icon">✨</span>
-        <span id="analyze-label">Analyze Scene</span>
+        <span id="analyze-label">Sahneyi Analiz Et</span>
       </button>
 
       <!-- Loading state -->
@@ -117,18 +117,18 @@
     <div class="card result-card hidden" id="result-card" aria-live="polite">
       <div class="result-header">
         <span class="result-icon">🔊</span>
-        <h2>Spatial Description</h2>
+        <h2>Mekansal Açıklama</h2>
       </div>
       <p id="result-text" class="result-text"></p>
       <div class="result-actions">
-        <button class="btn-tts" id="tts-btn" aria-label="Read description aloud">
-          ▶ Read Aloud
+        <button class="btn-tts" id="tts-btn" aria-label="Açıklamayı sesli oku">
+          ▶ Sesli Oku
         </button>
-        <button class="btn-stop hidden" id="tts-stop-btn" aria-label="Stop reading">
-          ⏹ Stop
+        <button class="btn-stop hidden" id="tts-stop-btn" aria-label="Okumayı durdur">
+          ⏹ Durdur
         </button>
-        <button class="btn-copy" id="copy-btn" aria-label="Copy description to clipboard">
-          📋 Copy
+        <button class="btn-copy" id="copy-btn" aria-label="Açıklamayı panoya kopyala">
+          📋 Kopyala
         </button>
       </div>
     </div>
@@ -141,7 +141,7 @@
   </main>
 
   <footer>
-    <p>Spatial Vision Assistant · Backend powered by <strong>FastAPI + vLLM (Qwen2-VL)</strong></p>
+    <p>Mekansal Görme Asistanı · <strong>FastAPI + vLLM (Qwen2-VL)</strong> altyapısıyla çalışır</p>
   </footer>
 
   <script src="app.js"></script>
