@@ -12,7 +12,7 @@
  */
 
 // ─── Config ───────────────────────────────────────────────────────────────────
-const API_BASE = "http://localhost:8001"; // Change to Vast.ai IP in production
+const API_BASE = ""; // Relative URL — works on any domain (localhost, ngrok, IP, etc.)
 
 // ─── DOM References ───────────────────────────────────────────────────────────
 const dropZone       = document.getElementById("drop-zone");
