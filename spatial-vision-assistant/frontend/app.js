@@ -374,17 +374,33 @@ analyzeBtn.addEventListener("click", async () => {
 });
 
 // ─── TTS (Browser SpeechSynthesis) ───────────────────────────────────────────
+function detectLanguage(text) {
+  // Simple check for English common words
+  const enWords = /\b(the|is|are|and|on|in|to|of|it|there|here|with)\b/i;
+  // Simple check for Turkish characters or common words
+  const trRegex = /[çğıöşüÇĞIÖŞÜ]/;
+  const trWords = /\b(ve|bir|var|yok|sağ|sol|üst|alt|için|bu|şu)\b/i;
+
+  if (enWords.test(text) && !trRegex.test(text)) return "en-US";
+  if (trRegex.test(text) || trWords.test(text)) return "tr-TR";
+  
+  return "tr-TR"; // Default fallback
+}
+
 function speakText(text) {
   window.speechSynthesis.cancel(); // stop any previous
   const utter = new SpeechSynthesisUtterance(text);
+  
+  const lang = detectLanguage(text);
+  utter.lang  = lang;
   utter.rate  = 0.88;
   utter.pitch = 1.0;
-  utter.lang  = "tr-TR";
 
-  // Try to find a Turkish voice
+  // Try to find a voice that matches the detected language
   const voices = window.speechSynthesis.getVoices();
-  const trVoice = voices.find(v => v.lang.startsWith("tr"));
-  if (trVoice) utter.voice = trVoice;
+  const prefix = lang.split("-")[0]; // "en" or "tr"
+  const matchedVoice = voices.find(v => v.lang.startsWith(prefix));
+  if (matchedVoice) utter.voice = matchedVoice;
 
   utter.onstart = () => {
     ttsBtn.classList.add("hidden");
