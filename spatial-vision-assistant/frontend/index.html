@@ -10,9 +10,13 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Intro Overlay for audio permission -->
-  <div id="intro-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.95); z-index:9999; display:flex; align-items:center; justify-content:center; color:white; font-size:1.5rem; text-align:center; cursor:pointer; padding:2rem;">
-    Başlamak için ekrana dokunun veya herhangi bir tuşa basın.
+  <!-- Intro Overlay for language selection -->
+  <div id="intro-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.95); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-size:1.5rem; text-align:center; padding:2rem;">
+    <p style="margin-bottom: 2rem;">Lütfen dil seçin / Please select a language</p>
+    <div style="display:flex; gap:1.5rem;">
+      <button id="lang-tr-btn" class="btn-primary" style="font-size:1.2rem; padding:1rem 2rem;">🇹🇷 Türkçe</button>
+      <button id="lang-en-btn" class="btn-secondary" style="font-size:1.2rem; padding:1rem 2rem;">🇬🇧 English</button>
+    </div>
   </div>
 
   <div class="bg-orbs">
@@ -31,14 +35,14 @@
 
   <main>
     <section class="hero">
-      <h1>Dünyayı<br /><span class="gradient-text">Sesle Gör</span></h1>
-      <p class="subtitle">Fotoğraf yükle, soru sor ve çevrenizdeki nesnelerin mekansal konumlarını sesli olarak öğren.</p>
+      <h1 id="ui-title">Dünyayı<br /><span class="gradient-text">Sesle Gör</span></h1>
+      <p class="subtitle" id="ui-subtitle">Fotoğraf yükle, soru sor ve çevrenizdeki nesnelerin mekansal konumlarını sesli olarak öğren.</p>
     </section>
 
     <!-- ── Step 1: Upload ── -->
     <div class="card" id="upload-card">
-      <div class="step-label">Adım 1</div>
-      <h2>Fotoğraf Yükle</h2>
+      <div class="step-label" id="ui-step1">Adım 1</div>
+      <h2 id="ui-step1-title">Fotoğraf Yükle</h2>
 
       <div
         class="drop-zone"
@@ -49,8 +53,8 @@
       >
         <div class="drop-zone-inner" id="drop-zone-inner">
           <div class="upload-icon">📷</div>
-          <p class="drop-title">Sürükle & bırak veya tıkla</p>
-          <p class="drop-sub">JPEG · PNG · WEBP — maks 10 MB</p>
+          <p class="drop-title" id="ui-drop-title">Sürükle & bırak veya tıkla</p>
+          <p class="drop-sub" id="ui-drop-sub">JPEG · PNG · WEBP — maks 10 MB</p>
         </div>
         <img id="preview-img" class="preview-img hidden" alt="Uploaded photo preview" />
         <input type="file" id="file-input" accept="image/*" aria-hidden="true" />
@@ -67,8 +71,8 @@
 
     <!-- ── Step 2: Question ── -->
     <div class="card" id="question-card">
-      <div class="step-label">Adım 2</div>
-      <h2>Sorunuzu Sorun</h2>
+      <div class="step-label" id="ui-step2">Adım 2</div>
+      <h2 id="ui-step2-title">Sorunuzu Sorun</h2>
 
       <div class="input-row">
         <textarea
@@ -102,9 +106,9 @@
 
     <!-- ── Step 3: Analyze ── -->
     <div class="card" id="action-card">
-      <div class="step-label">Adım 3</div>
-      <h2>Sahneyi Analiz Et</h2>
-      <p class="card-desc">Yapay zeka, görüntüdeki her şeyin mekansal düzenini Türkçe olarak açıklayacak.</p>
+      <div class="step-label" id="ui-step3">Adım 3</div>
+      <h2 id="ui-step3-title">Sahneyi Analiz Et</h2>
+      <p class="card-desc" id="ui-analyze-desc">Yapay zeka, görüntüdeki her şeyin mekansal düzenini açıklayacak.</p>
 
       <button
         class="btn-primary"
@@ -126,7 +130,7 @@
     <div class="card result-card hidden" id="result-card" aria-live="polite">
       <div class="result-header">
         <span class="result-icon">🔊</span>
-        <h2>Mekansal Açıklama</h2>
+        <h2 id="ui-result-title">Mekansal Açıklama</h2>
       </div>
       <p id="result-text" class="result-text"></p>
       <div class="result-actions">

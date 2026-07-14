@@ -22,6 +22,8 @@ const previewImg     = document.getElementById("preview-img");
 const clearBtn       = document.getElementById("clear-btn");
 const cameraBtn      = document.getElementById("camera-btn");
 const introOverlay   = document.getElementById("intro-overlay");
+const langTrBtn      = document.getElementById("lang-tr-btn");
+const langEnBtn      = document.getElementById("lang-en-btn");
 
 const questionInput  = document.getElementById("question-input");
 const voiceBtn       = document.getElementById("voice-btn");
@@ -181,19 +183,107 @@ clearBtn.addEventListener("click", () => {
   resultCard.classList.add("hidden");
 });
 
-// ─── Intro & Audio Permission ─────────────────────────────────────────────────
-let isIntroPlayed = false;
+// ─── Intro & Language Selection ───────────────────────────────────────────────
+const translations = {
+  tr: {
+    title: "Dünyayı<br /><span class=\"gradient-text\">Sesle Gör</span>",
+    subtitle: "Fotoğraf yükle, soru sor ve çevrenizdeki nesnelerin mekansal konumlarını sesli olarak öğren.",
+    step1: "Adım 1",
+    step1title: "Fotoğraf Yükle",
+    dropTitle: "Sürükle & bırak veya tıkla",
+    dropSub: "JPEG · PNG · WEBP — maks 10 MB",
+    cameraBtn: "📷 Kameradan Çek (İki kere Boşluk)",
+    clearBtn: "✕ Fotoğrafı kaldır",
+    step2: "Adım 2",
+    step2title: "Sorunuzu Sorun",
+    placeholder: "Örnek: Önümdeki masanın üzerinde ne var?",
+    voiceHint: "Kayıt için Tıkla",
+    step3: "Adım 3",
+    step3title: "Sahneyi Analiz Et",
+    analyzeDesc: "Yapay zeka, görüntüdeki her şeyin mekansal düzenini açıklayacak.",
+    analyzeBtn: "Sahneyi Analiz Et",
+    resultTitle: "Mekansal Açıklama",
+    ttsBtn: "▶ Sesli Oku",
+    stopBtn: "⏹ Durdur",
+    copyBtn: "📋 Kopyala",
+    cameraLoading: "Kamera açılıyor, lütfen bekleyin...",
+    cameraDone: "Fotoğraf çekildi. Lütfen sorunuzu sorun.",
+    cameraError: "Kameraya erişilemedi."
+  },
+  en: {
+    title: "See the World<br /><span class=\"gradient-text\">Through Sound</span>",
+    subtitle: "Upload a photo, ask a question, and receive a precise spatial audio description of your surroundings.",
+    step1: "Step 1",
+    step1title: "Upload Photo",
+    dropTitle: "Drag & drop or click to upload",
+    dropSub: "JPEG · PNG · WEBP — max 10 MB",
+    cameraBtn: "📷 Take Photo (Double Space)",
+    clearBtn: "✕ Remove photo",
+    step2: "Step 2",
+    step2title: "Ask Your Question",
+    placeholder: "e.g. What objects are on the table in front of me?",
+    voiceHint: "Hold to Record",
+    step3: "Step 3",
+    step3title: "Analyze Scene",
+    analyzeDesc: "AI will describe the spatial layout of everything in the image.",
+    analyzeBtn: "Analyze Scene",
+    resultTitle: "Spatial Description",
+    ttsBtn: "▶ Read Aloud",
+    stopBtn: "⏹ Stop",
+    copyBtn: "📋 Copy",
+    cameraLoading: "Opening camera, please wait...",
+    cameraDone: "Photo taken. You can ask your question now.",
+    cameraError: "Could not access the camera."
+  }
+};
 
-function playIntro() {
-  if (isIntroPlayed) return;
-  isIntroPlayed = true;
-  introOverlay.style.display = "none";
-  speakText("Mekansal Görme Asistanına hoş geldiniz. Fotoğraf çekmek için iki kere boşluk tuşuna basın.");
+let appLanguage = "tr"; // default
+
+function setLanguage(lang) {
+  appLanguage = lang;
+  const t = translations[lang];
+  
+  document.getElementById("ui-title").innerHTML = t.title;
+  document.getElementById("ui-subtitle").textContent = t.subtitle;
+  document.getElementById("ui-step1").textContent = t.step1;
+  document.getElementById("ui-step1-title").textContent = t.step1title;
+  document.getElementById("ui-drop-title").textContent = t.dropTitle;
+  document.getElementById("ui-drop-sub").textContent = t.dropSub;
+  cameraBtn.textContent = t.cameraBtn;
+  clearBtn.textContent = t.clearBtn;
+  
+  document.getElementById("ui-step2").textContent = t.step2;
+  document.getElementById("ui-step2-title").textContent = t.step2title;
+  questionInput.placeholder = t.placeholder;
+  voiceBtnLabel.textContent = t.voiceHint;
+  
+  document.getElementById("ui-step3").textContent = t.step3;
+  document.getElementById("ui-step3-title").textContent = t.step3title;
+  document.getElementById("ui-analyze-desc").textContent = t.analyzeDesc;
+  analyzeLabel.textContent = t.analyzeBtn;
+  
+  document.getElementById("ui-result-title").textContent = t.resultTitle;
+  ttsBtn.textContent = t.ttsBtn;
+  ttsStopBtn.textContent = t.stopBtn;
+  copyBtn.textContent = t.copyBtn;
+  
+  // Update speech recognition language
+  if (recognition) {
+    recognition.lang = lang === "tr" ? "tr-TR" : "en-US";
+  }
 }
 
-// Any interaction removes the overlay and plays the intro
-document.addEventListener("click", playIntro, { once: true });
-document.addEventListener("keydown", playIntro, { once: true });
+langTrBtn.addEventListener("click", () => {
+  introOverlay.style.display = "none";
+  setLanguage("tr");
+  speakText("Mekansal Görme Asistanına hoş geldiniz. Fotoğraf çekmek için iki kere boşluk tuşuna basın.");
+});
+
+langEnBtn.addEventListener("click", () => {
+  introOverlay.style.display = "none";
+  setLanguage("en");
+  speakText("Welcome to the Spatial Vision Assistant. Press the spacebar twice to take a photo.");
+});
 
 // ─── Camera Access (Double Space) ─────────────────────────────────────────────
 let lastSpacePress = 0;
@@ -217,7 +307,7 @@ cameraBtn.addEventListener("click", takePhotoFromCamera);
 
 async function takePhotoFromCamera() {
   try {
-    speakText("Kamera açılıyor, lütfen bekleyin...");
+    speakText(translations[appLanguage].cameraLoading);
     // Request back camera if on mobile, default on desktop
     const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "environment" } });
     
@@ -256,11 +346,11 @@ async function takePhotoFromCamera() {
         dropZoneInner.classList.add("hidden");
         clearBtn.style.display = "block";
         
-        speakText("Fotoğraf çekildi. Lütfen sorunuzu sorun.");
+        speakText(translations[appLanguage].cameraDone);
       }, 1500);
     };
   } catch (err) {
-    speakText("Kameraya erişilemedi. Lütfen izinleri kontrol edin.");
+    speakText(translations[appLanguage].cameraError);
     showError("Camera error: " + err.message);
   }
 }
