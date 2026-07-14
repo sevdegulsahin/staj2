@@ -22,8 +22,6 @@ const previewImg     = document.getElementById("preview-img");
 const clearBtn       = document.getElementById("clear-btn");
 const cameraBtn      = document.getElementById("camera-btn");
 const introOverlay   = document.getElementById("intro-overlay");
-const langTrBtn      = document.getElementById("lang-tr-btn");
-const langEnBtn      = document.getElementById("lang-en-btn");
 
 const questionInput  = document.getElementById("question-input");
 const voiceBtn       = document.getElementById("voice-btn");
@@ -238,6 +236,8 @@ const translations = {
 };
 
 let appLanguage = "tr"; // default
+let isAudioUnlocked = false;
+let isLanguageSelected = false;
 
 function setLanguage(lang) {
   appLanguage = lang;
@@ -267,34 +267,75 @@ function setLanguage(lang) {
   ttsStopBtn.textContent = t.stopBtn;
   copyBtn.textContent = t.copyBtn;
   
-  // Update speech recognition language
   if (recognition) {
     recognition.lang = lang === "tr" ? "tr-TR" : "en-US";
   }
 }
 
-langTrBtn.addEventListener("click", () => {
+function handleLanguageChoice(lang) {
+  isLanguageSelected = true;
   introOverlay.style.display = "none";
-  setLanguage("tr");
-  speakText("Mekansal Görme Asistanına hoş geldiniz. Fotoğraf çekmek için iki kere boşluk tuşuna basın.");
+  setLanguage(lang);
+  
+  if (lang === "tr") {
+    speakText("Mekansal Görme Asistanına hoş geldiniz. Fotoğraf çekmek için iki kere boşluk tuşuna basın.");
+  } else {
+    speakText("Welcome to the Spatial Vision Assistant. Press the spacebar twice to take a photo.");
+  }
+}
+
+function unlockAudio() {
+  if (isAudioUnlocked) return;
+  isAudioUnlocked = true;
+  
+  // Make the overlay split into two giant tap zones
+  introOverlay.innerHTML = `
+    <div id="tr-zone" style="flex:1; width:100%; display:flex; align-items:center; justify-content:center; border-bottom:2px solid rgba(255,255,255,0.2); font-size:2rem; background:rgba(0,0,0,0.5);">🇹🇷 Türkçe (Tap Top)</div>
+    <div id="en-zone" style="flex:1; width:100%; display:flex; align-items:center; justify-content:center; font-size:2rem; background:rgba(0,0,0,0.5);">🇬🇧 English (Tap Bottom)</div>
+  `;
+  
+  document.getElementById("tr-zone").addEventListener("click", (e) => {
+    e.stopPropagation();
+    handleLanguageChoice("tr");
+  });
+  
+  document.getElementById("en-zone").addEventListener("click", (e) => {
+    e.stopPropagation();
+    handleLanguageChoice("en");
+  });
+
+  // Speak instructions
+  speakText("Dil seçimi. Türkçe için ekranın üst kısmına dokunun veya T tuşuna basın. For English, tap the bottom of the screen or press E.");
+}
+
+// Global click to unlock audio
+document.addEventListener("click", (e) => {
+  if (!isAudioUnlocked && e.target.id === "intro-overlay") {
+    unlockAudio();
+  }
 });
 
-langEnBtn.addEventListener("click", () => {
-  introOverlay.style.display = "none";
-  setLanguage("en");
-  speakText("Welcome to the Spatial Vision Assistant. Press the spacebar twice to take a photo.");
-});
-
-// ─── Camera Access (Double Space) ─────────────────────────────────────────────
-let lastSpacePress = 0;
-
+// Global keydown for shortcuts
 document.addEventListener("keydown", (e) => {
+  if (!isAudioUnlocked) {
+    unlockAudio();
+    return;
+  }
+  
+  if (!isLanguageSelected) {
+    const key = e.key.toLowerCase();
+    if (key === "t") handleLanguageChoice("tr");
+    else if (key === "e") handleLanguageChoice("en");
+    return;
+  }
+  
+  // Normal logic once language is selected
   if (e.target.tagName === "TEXTAREA" || e.target.tagName === "INPUT") return;
 
   if (e.key === " ") {
-    e.preventDefault(); // prevent page scroll
+    e.preventDefault();
     const now = Date.now();
-    if (now - lastSpacePress < 500) { // 500ms for double tap
+    if (now - lastSpacePress < 500) {
       lastSpacePress = 0;
       takePhotoFromCamera();
     } else {
@@ -302,6 +343,8 @@ document.addEventListener("keydown", (e) => {
     }
   }
 });
+
+let lastSpacePress = 0;
 
 cameraBtn.addEventListener("click", takePhotoFromCamera);
 

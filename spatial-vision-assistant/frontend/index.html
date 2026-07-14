@@ -10,13 +10,9 @@
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <!-- Intro Overlay for language selection -->
-  <div id="intro-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.95); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-size:1.5rem; text-align:center; padding:2rem;">
-    <p style="margin-bottom: 2rem;">Lütfen dil seçin / Please select a language</p>
-    <div style="display:flex; gap:1.5rem;">
-      <button id="lang-tr-btn" class="btn-primary" style="font-size:1.2rem; padding:1rem 2rem;">🇹🇷 Türkçe</button>
-      <button id="lang-en-btn" class="btn-secondary" style="font-size:1.2rem; padding:1rem 2rem;">🇬🇧 English</button>
-    </div>
+  <!-- Intro Overlay for audio permission & language selection -->
+  <div id="intro-overlay" style="position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(15,23,42,0.95); z-index:9999; display:flex; flex-direction:column; align-items:center; justify-content:center; color:white; font-size:1.5rem; text-align:center; cursor:pointer;">
+    <p id="intro-msg">Başlamak için ekrana dokunun veya bir tuşa basın.<br/><br/>Tap the screen or press any key to start.</p>
   </div>
 
   <div class="bg-orbs">
